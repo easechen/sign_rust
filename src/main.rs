@@ -1,8 +1,8 @@
-use std::thread::sleep;
-use sign::{User, Api, get_course, get_sign_info, Course};
-use std::process::exit;
-use std::io::{stdin, stdout, Write};
+use sign::{get_course, get_sign_info, Api, Course, User};
 use std::env;
+use std::io::{stdin, stdout, Write};
+use std::process::exit;
+use std::thread::sleep;
 fn main() {
     let client = reqwest::blocking::Client::builder().cookie_store(true).user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36").cookie_store(true).build().expect("Client build Error.");
     let args: Vec<String> = env::args().collect();
@@ -11,7 +11,16 @@ fn main() {
         println!("{}", err);
         exit(1);
     });
-    let res = login_config.login(Api::LoginApi(String::from("https://data.educoder.net/api/accounts/login.json")), &client).unwrap().text().unwrap();
+    let res = login_config
+        .login(
+            Api::LoginApi(String::from(
+                "https://data.educoder.net/api/accounts/login.json",
+            )),
+            &client,
+        )
+        .unwrap()
+        .text()
+        .unwrap();
     // println!("{}", res);
     // if login error
     if !res.contains("name") {
@@ -30,17 +39,28 @@ fn main() {
     user.print_course();
     //select course in courses
     let mut course_select = String::new();
-    stdin().read_line(&mut course_select).expect("Stdin::read_line Error");
-    let index: usize = course_select.trim().parse().expect("Please enter a number.");
-    let course: &Course = user.course.get(index - 1).expect("Error: Type right index.");
+    stdin()
+        .read_line(&mut course_select)
+        .expect("Stdin::read_line Error");
+    let index: usize = course_select
+        .trim()
+        .parse()
+        .expect("Please enter a number.");
+    let course: &Course = user
+        .course
+        .get(index - 1)
+        .expect("Error: Type right index.");
     loop {
         println!("1,sign code 2,sign 3,quit");
-        let mut psc = String::new(); stdin().read_line(&mut psc).expect("Error loop stdin().read_line().");
-        let index:usize = psc.trim().parse().expect("Please enter a number");
+        let mut psc = String::new();
+        stdin()
+            .read_line(&mut psc)
+            .expect("Error loop stdin().read_line().");
+        let index: usize = psc.trim().parse().expect("Please enter a number");
         match index {
-            1  => {
+            1 => {
                 course.print_sign_code();
-            },
+            }
             2 => {
                 print!("waiting...");
                 // course.get_sign_code(&client);
@@ -65,10 +85,11 @@ fn main() {
                 println!("have exited.");
                 break;
             }
-            _ => {println!("Type right chiose.");}
+            _ => {
+                println!("Type right chiose.");
+            }
         }
     }
-
 
     // get_sign_info(Api::SignAttentionApi(String::from("https://data.educoder.net/api/courses/10779/attendances.json?coursesId=10779&id=10779&status=all&page=1")), &client);
 }
