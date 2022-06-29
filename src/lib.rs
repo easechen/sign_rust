@@ -161,6 +161,7 @@ impl User {
                 "{}      {}    {}     {}",
                 i, course.course_id, course.course_name, course.teacher
             );
+            i += 1;
         }
     }
 }
